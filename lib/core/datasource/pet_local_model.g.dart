@@ -20,19 +20,22 @@ class PetLocalModelAdapter extends TypeAdapter<PetLocalModel> {
       id: fields[0] as String,
       isAdopted: fields[1] as bool,
       isFavorited: fields[2] as bool,
+      adoptedAt: fields[3] as DateTime?,
     );
   }
 
   @override
   void write(BinaryWriter writer, PetLocalModel obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
       ..write(obj.isAdopted)
       ..writeByte(2)
-      ..write(obj.isFavorited);
+      ..write(obj.isFavorited)
+      ..writeByte(3)
+      ..write(obj.adoptedAt);
   }
 
   @override

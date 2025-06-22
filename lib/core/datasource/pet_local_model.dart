@@ -13,9 +13,13 @@ class PetLocalModel extends HiveObject {
   @HiveField(2)
   bool isFavorited;
 
+  @HiveField(3)
+  DateTime? adoptedAt;
+
   PetLocalModel({
     required this.id,
     this.isAdopted = false,
     this.isFavorited = false,
+    this.adoptedAt,
   });
 }
