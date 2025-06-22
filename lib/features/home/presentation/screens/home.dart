@@ -65,6 +65,9 @@ class _HomeState extends State<Home> {
     final textColor = theme.textTheme.bodyLarge?.color ?? AppColors.black;
     final isDark = theme.brightness == Brightness.dark;
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth > 600;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -145,33 +148,67 @@ class _HomeState extends State<Home> {
                         },
                         edgeOffset: 0,
                         displacement: 60,
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          itemCount: state.pets.length + 1,
-                          itemBuilder: (context, index) {
-                            if (index < state.pets.length) {
-                              final pet = state.pets[index];
-                              return PetCard(
-                                pet: pet,
-                                onPetClicked: (p) =>
-                                    context.pushNamed('detail', extra: p),
-                              );
-                            }
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final isTablet = constraints.maxWidth > 600;
 
-                            if (state.isLoadingMore) {
-                              return const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 24),
-                                child: Center(
-                                  child: CircularProgressIndicator(),
-                                ),
+                            if (isTablet) {
+                              return GridView.builder(
+                                controller: _scrollController,
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                padding: const EdgeInsets.only(bottom: 24),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      mainAxisSpacing: 16,
+                                      crossAxisSpacing: 16,
+                                      childAspectRatio: 1.5,
+                                    ),
+                                itemCount: state.pets.length,
+                                itemBuilder: (context, index) {
+                                  final pet = state.pets[index];
+                                  return PetCard(
+                                    pet: pet,
+                                    onPetClicked: (p) =>
+                                        context.pushNamed('detail', extra: p),
+                                  );
+                                },
                               );
                             } else {
-                              return const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 24),
-                                child: Center(
-                                  child: Text("No more pets available"),
-                                ),
+                              return ListView.builder(
+                                controller: _scrollController,
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                itemCount: state.pets.length + 1,
+                                itemBuilder: (context, index) {
+                                  if (index < state.pets.length) {
+                                    final pet = state.pets[index];
+                                    return PetCard(
+                                      pet: pet,
+                                      onPetClicked: (p) =>
+                                          context.pushNamed('detail', extra: p),
+                                    );
+                                  }
+
+                                  if (state.isLoadingMore) {
+                                    return const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 24,
+                                      ),
+                                      child: Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    );
+                                  } else {
+                                    return const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 24,
+                                      ),
+                                      child: Center(
+                                        child: Text("No more pets available"),
+                                      ),
+                                    );
+                                  }
+                                },
                               );
                             }
                           },

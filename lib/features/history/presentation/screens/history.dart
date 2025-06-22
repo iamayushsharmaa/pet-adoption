@@ -36,22 +36,55 @@ class History extends StatelessWidget {
               return RefreshIndicator(
                 onRefresh: () async {
                   context.read<AdoptionBloc>().add(LoadAdoptedPets());
-                  await Future.delayed(
-                    const Duration(milliseconds: 300),
-                  ); // optional delay for smoother UX
+                  await Future.delayed(const Duration(milliseconds: 300));
                 },
                 edgeOffset: 0,
                 displacement: 60,
-                child: ListView.builder(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: state.pets.length,
-                  itemBuilder: (context, index) {
-                    final pet = state.pets[index];
-                    return PetCard(
-                      pet: pet.toEntity(),
-                      onPetClicked: (p) =>
-                          Navigator.pushNamed(context, 'detail', arguments: p),
-                    );
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isTablet = constraints.maxWidth > 600;
+
+                    if (isTablet) {
+                      return GridView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.only(bottom: 24),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 16,
+                              crossAxisSpacing: 16,
+                              childAspectRatio: 1.5,
+                            ),
+                        itemCount: state.pets.length,
+                        itemBuilder: (context, index) {
+                          final pet = state.pets[index];
+                          return PetCard(
+                            pet: pet.toEntity(),
+                            onPetClicked: (p) => Navigator.pushNamed(
+                              context,
+                              'detail',
+                              arguments: p,
+                            ),
+                          );
+                        },
+                      );
+                    } else {
+                      return ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        itemCount: state.pets.length,
+                        itemBuilder: (context, index) {
+                          final pet = state.pets[index];
+                          return PetCard(
+                            pet: pet.toEntity(),
+                            onPetClicked: (p) => Navigator.pushNamed(
+                              context,
+                              'detail',
+                              arguments: p,
+                            ),
+                          );
+                        },
+                      );
+                    }
                   },
                 ),
               );
