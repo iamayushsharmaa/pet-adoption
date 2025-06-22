@@ -3,7 +3,7 @@ import 'package:hive/hive.dart';
 import '../../../../core/datasource/pet_local_model.dart';
 
 class FavoritesLocalService {
-  final Box<PetLocalModel> _box = Hive.box<PetLocalModel>('pets');
+  Box<PetLocalModel> get _box => Hive.box<PetLocalModel>('petStatus');
 
   List<PetLocalModel> getFavoritePets() {
     return _box.values.where((e) => e.isFavorited).toList();

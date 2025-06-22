@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 
 import '../../../../core/datasource/pet_local_model.dart';
 class HistoryLocalService {
-  final Box<PetLocalModel> _box = Hive.box<PetLocalModel>('pets');
+  final Box<PetLocalModel> _box = Hive.box<PetLocalModel>('petStatus');
 
   void markAsAdopted(PetLocalModel pet) {
     final existingPet = _box.get(pet.id);

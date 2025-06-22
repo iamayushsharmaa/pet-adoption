@@ -61,6 +61,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    print("Home screen building");
     final theme = Theme.of(context);
     final textColor = theme.textTheme.bodyLarge?.color ?? AppColors.black;
     final isDark = theme.brightness == Brightness.dark;

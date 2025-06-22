@@ -181,7 +181,7 @@ class _DetailState extends State<Detail> {
                     ),
                   ],
                 ),
-                const Spacer(),
+                const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
                   height: 55,

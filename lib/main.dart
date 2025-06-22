@@ -6,17 +6,16 @@ import 'package:petadoption/theme/theme_provider.dart';
 import 'config/routes.dart';
 import 'core/datasource/pet_local_model.dart';
 import 'features/home/data/model/pet_model.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final appDocumentDir = await getApplicationDocumentsDirectory();
-  Hive.init(appDocumentDir.path);
+  await Hive.initFlutter();
 
   if (!Hive.isAdapterRegistered(0)) {
     Hive.registerAdapter(PetModelAdapter());
   }
-
   if (!Hive.isAdapterRegistered(1)) {
     Hive.registerAdapter(PetLocalModelAdapter());
   }

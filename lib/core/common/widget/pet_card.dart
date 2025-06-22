@@ -48,11 +48,11 @@ class PetCard extends StatelessWidget {
                       child: Image.network(
                         pet.imageUrl,
                         height: double.infinity,
-                        width: constraints.maxWidth > 400 ? 140 : 110,
+                        width: constraints.maxWidth > 400 ? 300 : 110,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
                           color: Colors.grey.shade300,
-                          width: constraints.maxWidth > 400 ? 140 : 110,
+                          width: constraints.maxWidth > 400 ? 300 : 110,
                           height: double.infinity,
                           child: const Icon(Icons.pets, size: 40),
                         ),
@@ -64,12 +64,39 @@ class PetCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          pet.age,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontSize: 13,
-                            color: isDark ? Colors.grey[400] : Colors.grey[700],
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              pet.age,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontSize: 13,
+                                color: isDark
+                                    ? Colors.grey[400]
+                                    : Colors.grey[700],
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            if (pet.isAdopted)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade700,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Text(
+                                  'Adopted',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -136,26 +163,6 @@ class PetCard extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 10),
-                            if (pet.isAdopted)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade700,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: const Text(
-                                  'Already Adopted',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
                           ],
                         ),
                       ],
