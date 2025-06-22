@@ -8,7 +8,7 @@ part of 'pet_local_model.dart';
 
 class PetLocalModelAdapter extends TypeAdapter<PetLocalModel> {
   @override
-  final int typeId = 0;
+  final int typeId = 1;
 
   @override
   PetLocalModel read(BinaryReader reader) {

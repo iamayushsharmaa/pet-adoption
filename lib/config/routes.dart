@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:petadoption/config/widget_tree.dart';
+import 'package:petadoption/features/detailscreen/presentation/screens/detail_screen.dart';
 import 'package:petadoption/features/search/screens/search.dart';
 
 import '../core/network/dio_client.dart';
@@ -14,7 +15,7 @@ import '../features/home/domain/usecases/get_all_pets_usecases.dart';
 import '../features/home/presentation/screens/home.dart';
 
 GoRouter createRouter() {
-  final initialLocation = '/home';
+  final initialLocation = '/detail';
   final dioInstance = DioClient.create();
 
   return GoRouter(
@@ -22,9 +23,9 @@ GoRouter createRouter() {
     initialLocation: initialLocation,
     routes: [
       GoRoute(
-        path: '/search',
-        name: 'search',
-        builder: (context, state) => Search(),
+        path: '/detail',
+        name: 'detail',
+        builder: (context, state) => Detail(),
       ),
       ShellRoute(
         builder: (context, state, child) => WidgetTree(child: child),

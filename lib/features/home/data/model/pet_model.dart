@@ -5,7 +5,7 @@ import '../../../../core/entities/pet_entity.dart';
 part 'pet_model.g.dart';
 
 @HiveType(typeId: 0)
-class PetModel extends PetEntity {
+class PetModel extends HiveObject {
   @HiveField(0)
   final String id;
 
@@ -47,42 +47,52 @@ class PetModel extends PetEntity {
     required this.imageUrl,
     required this.location,
     required this.description,
-  }) : super(
-         id: id,
-         name: name,
-         type: type,
-         breed: breed,
-         age: age,
-         price: price,
-         gender: gender,
-         imageUrl: imageUrl,
-         location: location,
-         description: description,
-       );
+  });
 
-  factory PetModel.fromJson(Map<String, dynamic> json) => PetModel(
-    id: json['id'],
-    name: json['name'],
-    type: json['type'],
-    breed: json['breed'],
-    age: json['age'],
-    price: (json['price'] as num).toDouble(),
-    gender: json['gender'],
-    imageUrl: json['imageUrl'],
-    location: json['location'],
-    description: json['description'],
-  );
+  factory PetModel.fromJson(Map<String, dynamic> json) {
+    return PetModel(
+      id: json['id'],
+      name: json['name'],
+      type: json['type'],
+      breed: json['breed'],
+      age: json['age'],
+      price: (json['price'] as num).toDouble(),
+      gender: json['gender'],
+      imageUrl: json['imageUrl'],
+      location: json['location'],
+      description: json['description'],
+    );
+  }
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'type': type,
-    'breed': breed,
-    'age': age,
-    'price': price,
-    'gender': gender,
-    'imageUrl': imageUrl,
-    'location': location,
-    'description': description,
-  };
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'type': type,
+      'breed': breed,
+      'age': age,
+      'price': price,
+      'gender': gender,
+      'imageUrl': imageUrl,
+      'location': location,
+      'description': description,
+    };
+  }
+
+  PetEntity toEntity({bool isAdopted = false, bool isFavorited = false}) {
+    return PetEntity(
+      id: id,
+      name: name,
+      type: type,
+      breed: breed,
+      age: age,
+      price: price,
+      gender: gender,
+      imageUrl: imageUrl,
+      location: location,
+      description: description,
+      isAdopted: isAdopted,
+      isFavorited: isFavorited,
+    );
+  }
 }

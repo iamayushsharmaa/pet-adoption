@@ -13,12 +13,18 @@ void main() async {
   final appDocumentDir = await getApplicationDocumentsDirectory();
   Hive.init(appDocumentDir.path);
 
-  Hive.registerAdapter(PetLocalModelAdapter());
-  await Hive.openBox<PetLocalModel>('petStatus');
-  Hive.registerAdapter(PetModelAdapter());
-  await Hive.openBox<PetModel>('cachedPets');
+  if (!Hive.isAdapterRegistered(0)) {
+    Hive.registerAdapter(PetModelAdapter());
+  }
 
-  runApp(MyApp());
+  if (!Hive.isAdapterRegistered(1)) {
+    Hive.registerAdapter(PetLocalModelAdapter());
+  }
+
+  await Hive.openBox<PetModel>('cachedPets');
+  await Hive.openBox<PetLocalModel>('petStatus');
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
