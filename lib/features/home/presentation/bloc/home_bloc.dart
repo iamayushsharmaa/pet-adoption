@@ -9,31 +9,61 @@ part 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetAllPetsUseCase getAllPets;
+  int _currentPage = 1;
+  final int _limit = 10;
+  bool _isLoadingMore = false;
+  List<PetEntity> _allPets = [];
 
   HomeBloc(this.getAllPets) : super(HomeInitial()) {
     on<LoadPets>(_onLoadPets);
-    on<RefreshPets>(_onRefreshPets);
+    on<LoadMorePets>(_onLoadMorePets);
+    on<SearchPets>(_onSearchPets);
   }
 
   Future<void> _onLoadPets(LoadPets event, Emitter<HomeState> emit) async {
     emit(HomeLoading());
+    _currentPage = 1;
     try {
-      final pets = await getAllPets();
-      emit(HomeLoaded(pets));
+      final pets = await getAllPets(page: _currentPage, limit: _limit);
+      _allPets = pets;
+      emit(HomeLoaded(_allPets));
     } catch (_) {
-      emit(HomeError('Failed to load pets'));
+      emit(HomeError("Failed to load pets"));
     }
   }
 
-  Future<void> _onRefreshPets(
-    RefreshPets event,
+  Future<void> _onLoadMorePets(
+    LoadMorePets event,
     Emitter<HomeState> emit,
   ) async {
+    if (_isLoadingMore) return;
+    _isLoadingMore = true;
+
+    emit(HomeLoaded(_allPets, isLoadingMore: true));
+
     try {
-      final pets = await getAllPets();
-      emit(HomeLoaded(pets));
+      _currentPage++;
+      final newPets = await getAllPets(page: _currentPage, limit: _limit);
+      if (newPets.isNotEmpty) {
+        _allPets.addAll(newPets);
+      }
+      emit(HomeLoaded(List.from(_allPets)));
     } catch (_) {
-      emit(HomeError('Failed to refresh pets'));
+      emit(HomeError("Failed to load more pets"));
     }
+
+    _isLoadingMore = false;
+  }
+
+  void _onSearchPets(SearchPets event, Emitter<HomeState> emit) {
+    final query = event.query.toLowerCase();
+
+    final filtered = _allPets.where((pet) {
+      return pet.name.toLowerCase().contains(query) ||
+          pet.breed.toLowerCase().contains(query) ||
+          pet.type.toLowerCase().contains(query);
+    }).toList();
+
+    emit(HomeLoaded(filtered));
   }
 }
