@@ -2,6 +2,8 @@
 
 A new Flutter project.
 
+Web link - https://cute-valkyrie-227902.netlify.app/#/home
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
