@@ -14,7 +14,7 @@ void main() async {
   Hive.init(appDocumentDir.path);
 
   Hive.registerAdapter(PetLocalModelAdapter());
-  await Hive.openBox<PetLocalModel>('pets');
+  await Hive.openBox<PetLocalModel>('petStatus');
   Hive.registerAdapter(PetModelAdapter());
   await Hive.openBox<PetModel>('cachedPets');
 

@@ -9,30 +9,32 @@ class PetApiService {
 
   PetApiService(this.dio, this._cacheBox);
 
-  Future<List<PetModel>> fetchPets() async {
+  Future<List<PetModel>> fetchPets({int page = 1, int limit = 10}) async {
     try {
       final response = await dio.get(
-        'https://6857a33021f5d3463e55b51a.mockapi.io/petadoption/v1/pets',
+        '/pets',
+        queryParameters: {
+          'page': page,
+          'limit': limit,
+        },
       );
 
       final pets = (response.data as List)
           .map((e) => PetModel.fromJson(e))
           .toList();
 
-      // Cache to Hive
-      await _cacheBox.clear();
+      if (page == 1) {
+        await _cacheBox.clear();
+      }
+
       for (var pet in pets) {
         await _cacheBox.put(pet.id, pet);
       }
 
       return pets;
     } catch (e) {
-      // On failure, return cached data
       return _cacheBox.values.toList();
     }
   }
-
-  List<PetModel> getCachedPets() {
-    return _cacheBox.values.toList();
-  }
 }
+
