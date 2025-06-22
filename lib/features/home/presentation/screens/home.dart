@@ -82,7 +82,8 @@ class _HomeState extends State<Home> {
               const SizedBox(height: 16),
               Container(
                 decoration: BoxDecoration(
-                  color: theme.inputDecorationTheme.fillColor ?? theme.cardColor,
+                  color:
+                      theme.inputDecorationTheme.fillColor ?? theme.cardColor,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
@@ -108,11 +109,15 @@ class _HomeState extends State<Home> {
                   decoration: InputDecoration(
                     icon: Icon(
                       Icons.search,
-                      color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                      color: isDark
+                          ? Colors.grey.shade400
+                          : Colors.grey.shade600,
                     ),
                     hintText: 'Search...',
                     hintStyle: TextStyle(
-                      color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
+                      color: isDark
+                          ? Colors.grey.shade500
+                          : Colors.grey.shade600,
                     ),
                     border: InputBorder.none,
                   ),
@@ -134,33 +139,43 @@ class _HomeState extends State<Home> {
                     if (state is HomeLoading) {
                       return const Center(child: CircularProgressIndicator());
                     } else if (state is HomeLoaded) {
-                      return ListView.builder(
-                        controller: _scrollController,
-                        itemCount: state.pets.length + 1,
-                        itemBuilder: (context, index) {
-                          if (index < state.pets.length) {
-                            final pet = state.pets[index];
-                            return PetCard(
-                              pet: pet,
-                              onPetClicked: (p) =>
-                                  context.pushNamed('detail', extra: p),
-                            );
-                          }
-
-                          if (state.isLoadingMore) {
-                            return const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 24),
-                              child: Center(child: CircularProgressIndicator()),
-                            );
-                          } else {
-                            return const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 24),
-                              child: Center(
-                                child: Text("No more pets available"),
-                              ),
-                            );
-                          }
+                      return RefreshIndicator(
+                        onRefresh: () async {
+                          context.read<HomeBloc>().add(LoadPets());
                         },
+                        edgeOffset: 0,
+                        displacement: 60,
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          itemCount: state.pets.length + 1,
+                          itemBuilder: (context, index) {
+                            if (index < state.pets.length) {
+                              final pet = state.pets[index];
+                              return PetCard(
+                                pet: pet,
+                                onPetClicked: (p) =>
+                                    context.pushNamed('detail', extra: p),
+                              );
+                            }
+
+                            if (state.isLoadingMore) {
+                              return const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 24),
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            } else {
+                              return const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 24),
+                                child: Center(
+                                  child: Text("No more pets available"),
+                                ),
+                              );
+                            }
+                          },
+                        ),
                       );
                     } else if (state is HomeError) {
                       return Center(child: Text(state.message));

@@ -33,16 +33,27 @@ class History extends StatelessWidget {
                 return const Center(child: Text("No pets adopted yet"));
               }
 
-              return ListView.builder(
-                itemCount: state.pets.length,
-                itemBuilder: (context, index) {
-                  final pet = state.pets[index];
-                  return PetCard(
-                    pet: pet.toEntity(),
-                    onPetClicked: (p) =>
-                        Navigator.pushNamed(context, 'detail', arguments: p),
-                  );
+              return RefreshIndicator(
+                onRefresh: () async {
+                  context.read<AdoptionBloc>().add(LoadAdoptedPets());
+                  await Future.delayed(
+                    const Duration(milliseconds: 300),
+                  ); // optional delay for smoother UX
                 },
+                edgeOffset: 0,
+                displacement: 60,
+                child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: state.pets.length,
+                  itemBuilder: (context, index) {
+                    final pet = state.pets[index];
+                    return PetCard(
+                      pet: pet.toEntity(),
+                      onPetClicked: (p) =>
+                          Navigator.pushNamed(context, 'detail', arguments: p),
+                    );
+                  },
+                ),
               );
             }
 
