@@ -1,12 +1,11 @@
-
-#🐾 Pet Adoption App
+## 🐾 Pet Adoption App
 
 A beautiful and responsive Flutter app to browse, adopt, and favorite pets. Built using clean architecture, state management with BLoC, offline caching with Hive, and infinite scroll with pagination.
 
-#🌐 Live Demo
+## 🌐 Live Demo
 🔗 https://cute-valkyrie-227902.netlify.app/#/home
 
-#📱 Features
+## 📱 Features
 🔍 Search pets by name or breed
 
 🐶 View pet details with images and adoption info
@@ -27,7 +26,7 @@ A beautiful and responsive Flutter app to browse, adopt, and favorite pets. Buil
 
 🧪 Unit tested with Mocktail and Hive test utilities
 
-#🧰 Tech Stack
+## 🧰 Tech Stack
 Flutter
 
 BLoC for state management
