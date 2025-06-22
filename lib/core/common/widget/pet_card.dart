@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:petadoption/core/entities/pet_entity.dart';
-import 'package:flutter/material.dart';
 
 import '../../../theme/app_colors.dart';
 
@@ -8,17 +7,14 @@ class PetCard extends StatelessWidget {
   final PetEntity pet;
   final Function(PetEntity pet) onPetClicked;
 
-  const PetCard({
-    super.key,
-    required this.onPetClicked,
-    required this.pet,
-  });
+  const PetCard({super.key, required this.onPetClicked, required this.pet});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textColor = theme.textTheme.bodyLarge?.color ?? AppColors.black;
     final bgColor = theme.cardColor;
+    final isDark = theme.brightness == Brightness.dark;
 
     return GestureDetector(
       onTap: () => onPetClicked(pet),
@@ -30,12 +26,13 @@ class PetCard extends StatelessWidget {
           color: bgColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
-            if (theme.brightness == Brightness.light)
-              BoxShadow(
-                color: Colors.black.withOpacity(0.07),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
-              ),
+            BoxShadow(
+              color: isDark
+                  ? Colors.black.withOpacity(0.4)
+                  : Colors.black.withOpacity(0.07),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
           ],
         ),
         child: Row(
@@ -62,14 +59,17 @@ class PetCard extends StatelessWidget {
                 children: [
                   Text(
                     pet.age,
-                    style: TextStyle(fontSize: 13, color: textColor.withOpacity(0.6)),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontSize: 13,
+                      color: isDark ? Colors.grey[400] : Colors.grey[700],
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     pet.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: theme.textTheme.titleLarge?.copyWith(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: textColor,
@@ -80,12 +80,15 @@ class PetCard extends StatelessWidget {
                     children: [
                       Text(
                         'Price: ',
-                        style: TextStyle(fontSize: 14, color: textColor.withOpacity(0.6)),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontSize: 14,
+                          color: isDark ? Colors.grey[400] : Colors.grey[700],
+                        ),
                       ),
                       Expanded(
                         child: Text(
                           '₹${pet.price.toStringAsFixed(0)}',
-                          style: TextStyle(
+                          style: theme.textTheme.bodyLarge?.copyWith(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                             color: textColor,
@@ -100,33 +103,31 @@ class PetCard extends StatelessWidget {
                   Align(
                     alignment: Alignment.bottomLeft,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 5,
+                      ),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
+                        color: theme.colorScheme.primary.withOpacity(
+                          isDark ? 0.08 : 0.12,
+                        ),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
+                          color: theme.colorScheme.primary.withOpacity(
+                            isDark ? 0.25 : 0.4,
+                          ),
                         ),
-                        boxShadow: [
-                          if (Theme.of(context).brightness == Brightness.light)
-                            BoxShadow(
-                              color: Theme.of(context).colorScheme.primary.withOpacity(0.25),
-                              blurRadius: 6,
-                              offset: const Offset(0, 3),
-                            ),
-                        ],
                       ),
                       child: Text(
                         pet.breed,
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: Theme.of(context).colorScheme.primary,
+                          color: theme.colorScheme.primary,
                         ),
                       ),
                     ),
                   ),
-
                 ],
               ),
             ),

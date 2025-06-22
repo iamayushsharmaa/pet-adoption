@@ -1,8 +1,11 @@
+import 'package:petadoption/core/datasource/pet_local_model.dart';
+
 import '../../data/repository/favorites_repository.dart';
 
-class GetFavoritePetIds {
+class GetFavoritePets {
   final FavoritesRepository repository;
-  GetFavoritePetIds(this.repository);
 
-  Future<List<String>> call() => repository.getFavoritePetIds();
+  GetFavoritePets(this.repository);
+
+  Future<List<PetLocalModel>> call() => repository.getFavoritePets();
 }

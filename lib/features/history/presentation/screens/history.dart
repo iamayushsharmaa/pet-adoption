@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:petadoption/core/entities/pet_entity.dart';
+
+import '../../../../core/common/widget/pet_card.dart';
+import '../bloc/adopt_bloc.dart'; // Update path accordingly
 
 class History extends StatelessWidget {
   const History({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Load the adopted pets when screen builds
+    context.read<AdoptionBloc>().add(LoadAdoptedPets());
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -14,9 +22,32 @@ class History extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [],
+        child: BlocBuilder<AdoptionBloc, AdoptionState>(
+          builder: (context, state) {
+            if (state is AdoptionLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is AdoptionFailure) {
+              return Center(child: Text(state.message));
+            } else if (state is AdoptionHistoryLoaded) {
+              if (state.pets.isEmpty) {
+                return const Center(child: Text("No pets adopted yet"));
+              }
+
+              return ListView.builder(
+                itemCount: state.pets.length,
+                itemBuilder: (context, index) {
+                  final pet = state.pets[index];
+                  return PetCard(
+                    pet: pet.toEntity(),
+                    onPetClicked: (p) =>
+                        Navigator.pushNamed(context, 'detail', arguments: p),
+                  );
+                },
+              );
+            }
+
+            return const SizedBox.shrink();
+          },
         ),
       ),
     );

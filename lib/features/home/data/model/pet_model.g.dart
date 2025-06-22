@@ -22,7 +22,7 @@ class PetModelAdapter extends TypeAdapter<PetModel> {
       type: fields[2] as String,
       breed: fields[3] as String,
       age: fields[4] as String,
-      price: fields[5] as double,
+      price: fields[5] as int,
       gender: fields[6] as String,
       imageUrl: fields[7] as String,
       location: fields[8] as String,

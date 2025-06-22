@@ -1,3 +1,4 @@
+import '../../../../core/datasource/pet_local_model.dart';
 import '../../data/local/favorite_local_service.dart';
 import '../../data/repository/favorites_repository.dart';
 
@@ -7,12 +8,12 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
   FavoritesRepositoryImpl(this.localService);
 
   @override
-  Future<List<String>> getFavoritePetIds() async {
-    return localService.getFavoriteIds();
+  Future<List<PetLocalModel>> getFavoritePets() async {
+    return localService.getFavoritePets();
   }
 
   @override
-  Future<void> toggleFavorite(String id) async {
-    localService.toggleFavorite(id);
+  Future<void> toggleFavorite(PetLocalModel pet) async {
+    localService.toggleFavorite(pet);
   }
 }

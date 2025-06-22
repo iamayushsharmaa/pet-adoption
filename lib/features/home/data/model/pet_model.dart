@@ -22,7 +22,7 @@ class PetModel extends HiveObject {
   final String age;
 
   @HiveField(5)
-  final double price;
+  final int price;
 
   @HiveField(6)
   final String gender;
@@ -50,17 +50,20 @@ class PetModel extends HiveObject {
   });
 
   factory PetModel.fromJson(Map<String, dynamic> json) {
+    final fallbackId =
+        json['name'] ?? DateTime.now().millisecondsSinceEpoch.toString();
+
     return PetModel(
-      id: json['id'],
-      name: json['name'],
-      type: json['type'],
-      breed: json['breed'],
-      age: json['age'],
-      price: (json['price'] as num).toDouble(),
-      gender: json['gender'],
-      imageUrl: json['imageUrl'],
-      location: json['location'],
-      description: json['description'],
+      id: json['id'] ?? fallbackId,
+      name: json['name'] ?? 'Unnamed',
+      type: json['type'] ?? '',
+      breed: json['breed'] ?? '',
+      age: json['age'] ?? '',
+      price: (json['price'] ?? 0),
+      gender: json['gender'] ?? '',
+      imageUrl: json['imageUrl'] ?? '',
+      location: json['location'] ?? '',
+      description: json['description'] ?? '',
     );
   }
 

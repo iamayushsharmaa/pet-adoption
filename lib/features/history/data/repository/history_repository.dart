@@ -1,7 +1,7 @@
 import '../../../../core/datasource/pet_local_model.dart';
 
 abstract class HistoryRepository {
-  void markPetAsAdopted(String petId);
+  void markPetAsAdopted(PetLocalModel pet);
 
   List<PetLocalModel> getAdoptedHistory();
 }

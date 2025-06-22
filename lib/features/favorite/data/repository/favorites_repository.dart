@@ -1,5 +1,7 @@
-abstract class FavoritesRepository {
-  Future<List<String>> getFavoritePetIds();
+import 'package:petadoption/core/datasource/pet_local_model.dart';
 
-  Future<void> toggleFavorite(String id);
+abstract class FavoritesRepository {
+  Future<List<PetLocalModel>> getFavoritePets();
+
+  Future<void> toggleFavorite(PetLocalModel pet);
 }

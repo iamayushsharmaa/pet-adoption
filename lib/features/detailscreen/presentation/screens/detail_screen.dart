@@ -1,14 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:petadoption/features/favorite/presentation/bloc/favorite_bloc.dart';
 
-class Detail extends StatelessWidget {
-  const Detail({super.key});
+import '../../../../core/datasource/pet_local_model.dart';
+import '../../../../core/entities/pet_entity.dart';
+import '../../../history/presentation/bloc/adopt_bloc.dart';
+
+class Detail extends StatefulWidget {
+  final PetEntity pet;
+
+  const Detail({super.key, required this.pet});
+
+  @override
+  State<Detail> createState() => _DetailState();
+}
+
+class _DetailState extends State<Detail> {
+  late bool isFavorited;
+  late bool isAdopted;
+
+  @override
+  void initState() {
+    super.initState();
+    isFavorited = widget.pet.isFavorited;
+    isAdopted = widget.pet.isAdopted;
+  }
+
+  void _toggleFavorite(BuildContext context) {
+    setState(() {
+      isFavorited = !isFavorited;
+    });
+
+    final updatedPet = widget.pet.copyWith(isFavorited: isFavorited);
+    final localModel = PetLocalModel.fromEntity(updatedPet);
+
+    context.read<FavoritesBloc>().add(ToggleFavoritePet(localModel));
+  }
+
+  void _handleAdopt(BuildContext context) {
+    final updatedPet = widget.pet.copyWith(isAdopted: true);
+    final petModel = PetLocalModel.fromEntity(updatedPet);
+    context.read<AdoptionBloc>().add(AdoptPet(petModel));
+    setState(() {
+      isAdopted = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final priceBgColor = isDark ? Colors.grey[800] : Colors.grey[200];
     final priceTextColor = isDark ? Colors.white : Colors.black87;
-    final buttonColor = isDark ? Colors.tealAccent[700] : Colors.teal;
 
     return Scaffold(
       appBar: AppBar(
@@ -23,15 +65,26 @@ class Detail extends StatelessWidget {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
         child: Column(
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  onPressed: () => _toggleFavorite(context),
+                  icon: Icon(
+                    isFavorited ? Icons.favorite : Icons.favorite_border,
+                    color: isDark ? Colors.redAccent : Colors.red,
+                    size: 28,
+                  ),
+                ),
+              ],
+            ),
             Center(
               child: CircleAvatar(
                 radius: 160,
-                backgroundImage: NetworkImage(
-                  'https://images.unsplash.com/photo-1558788353-f76d92427f16',
-                ),
+                backgroundImage: NetworkImage(widget.pet.imageUrl),
               ),
             ),
             const SizedBox(height: 16),
@@ -40,10 +93,12 @@ class Detail extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Fluffy',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  widget.pet.name,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,
@@ -54,7 +109,7 @@ class Detail extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    '\$120',
+                    '₹${widget.pet.price.toStringAsFixed(0)}',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -66,22 +121,26 @@ class Detail extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Description
-            const Text(
-              'Fluffy is a playful and loving kitten who enjoys cuddles and chasing toys. She\'s looking for a forever home!',
-              style: TextStyle(fontSize: 16),
-            ),
+            Text(widget.pet.description, style: const TextStyle(fontSize: 16)),
             const SizedBox(height: 24),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                IconText(icon: Icons.pets, label: 'Breed', value: 'Persian'),
-                IconText(icon: Icons.female, label: 'Gender', value: 'Female'),
+              children: [
+                IconText(
+                  icon: Icons.pets,
+                  label: 'Breed',
+                  value: widget.pet.breed,
+                ),
+                IconText(
+                  icon: widget.pet.gender == 'Male' ? Icons.male : Icons.female,
+                  label: 'Gender',
+                  value: widget.pet.gender,
+                ),
                 IconText(
                   icon: Icons.calendar_today,
                   label: 'Age',
-                  value: '2 yrs',
+                  value: widget.pet.age,
                 ),
               ],
             ),
@@ -91,29 +150,23 @@ class Detail extends StatelessWidget {
               height: 55,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                      : Colors.black,
+                  backgroundColor: isDark ? Colors.white : Colors.black,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                onPressed: () {
-                  // Handle adoption
-                },
+                onPressed: isAdopted ? null : () => _handleAdopt(context),
                 child: Text(
-                  'Adopt Me',
+                  isAdopted ? 'Already Adopted' : 'Adopt Me',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.black
-                        : Colors.white,
+                    color: isDark ? Colors.black : Colors.white,
                   ),
                 ),
               ),
             ),
+            const SizedBox(height: 8),
           ],
         ),
       ),

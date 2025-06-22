@@ -7,11 +7,13 @@ import '../../domain/usecases/get_all_pets_usecases.dart';
 part 'home_event.dart';
 part 'home_state.dart';
 
+
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetAllPetsUseCase getAllPets;
   int _currentPage = 1;
   final int _limit = 10;
   bool _isLoadingMore = false;
+  bool _hasReachedEnd = false;
   List<PetEntity> _allPets = [];
 
   HomeBloc(this.getAllPets) : super(HomeInitial()) {
@@ -23,30 +25,32 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   Future<void> _onLoadPets(LoadPets event, Emitter<HomeState> emit) async {
     emit(HomeLoading());
     _currentPage = 1;
+    _hasReachedEnd = false;
     try {
       final pets = await getAllPets(page: _currentPage, limit: _limit);
       _allPets = pets;
+      if (pets.length < _limit) _hasReachedEnd = true;
       emit(HomeLoaded(_allPets));
     } catch (_) {
       emit(HomeError("Failed to load pets"));
     }
   }
 
-  Future<void> _onLoadMorePets(
-    LoadMorePets event,
-    Emitter<HomeState> emit,
-  ) async {
-    if (_isLoadingMore) return;
-    _isLoadingMore = true;
+  Future<void> _onLoadMorePets(LoadMorePets event, Emitter<HomeState> emit) async {
+    if (_isLoadingMore || _hasReachedEnd) return;
 
+    _isLoadingMore = true;
     emit(HomeLoaded(_allPets, isLoadingMore: true));
 
     try {
       _currentPage++;
       final newPets = await getAllPets(page: _currentPage, limit: _limit);
-      if (newPets.isNotEmpty) {
-        _allPets.addAll(newPets);
+
+      if (newPets.isEmpty || newPets.length < _limit) {
+        _hasReachedEnd = true;
       }
+
+      _allPets.addAll(newPets);
       emit(HomeLoaded(List.from(_allPets)));
     } catch (_) {
       emit(HomeError("Failed to load more pets"));

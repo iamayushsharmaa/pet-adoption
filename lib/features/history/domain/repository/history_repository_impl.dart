@@ -8,8 +8,8 @@ class HistoryRepositoryImpl implements HistoryRepository {
   HistoryRepositoryImpl(this.localService);
 
   @override
-  void markPetAsAdopted(String petId) {
-    localService.markAsAdopted(petId);
+  void markPetAsAdopted(PetLocalModel pet) {
+    localService.markAsAdopted(pet);
   }
 
   @override

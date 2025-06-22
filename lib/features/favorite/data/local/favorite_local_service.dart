@@ -5,17 +5,19 @@ import '../../../../core/datasource/pet_local_model.dart';
 class FavoritesLocalService {
   final Box<PetLocalModel> _box = Hive.box<PetLocalModel>('pets');
 
-  List<String> getFavoriteIds() {
-    return _box.values.where((e) => e.isFavorited).map((e) => e.id).toList();
+  List<PetLocalModel> getFavoritePets() {
+    return _box.values.where((e) => e.isFavorited).toList();
   }
 
-  void toggleFavorite(String petId) {
-    final pet = _box.get(petId);
-    if (pet != null) {
-      pet.isFavorited = !pet.isFavorited;
-      pet.save();
+  void toggleFavorite(PetLocalModel pet) {
+    final existing = _box.get(pet.id);
+
+    if (existing != null) {
+      existing.isFavorited = !existing.isFavorited;
+      existing.save();
     } else {
-      _box.put(petId, PetLocalModel(id: petId, isFavorited: true));
+      pet.isFavorited = true;
+      _box.put(pet.id, pet);
     }
   }
 }

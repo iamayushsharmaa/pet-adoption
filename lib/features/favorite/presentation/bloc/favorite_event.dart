@@ -1,11 +1,11 @@
 part of 'favorite_bloc.dart';
 
-@immutable
-sealed class FavoriteEvent {}
+abstract class FavoritesEvent {}
 
-class ToggleFavoriteEvent extends FavoriteEvent {
-  final String petId;
-  ToggleFavoriteEvent(this.petId);
+class LoadFavorites extends FavoritesEvent {}
+
+class ToggleFavoritePet extends FavoritesEvent {
+  final PetLocalModel pet;
+
+  ToggleFavoritePet(this.pet);
 }
-
-

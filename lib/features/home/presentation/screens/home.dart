@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:petadoption/features/home/presentation/bloc/home_bloc.dart';
 
 import '../../../../core/common/widget/pet_card.dart';
@@ -37,42 +40,91 @@ class _HomeState extends State<Home> {
     });
   }
 
+  Timer? _debounce;
+  final FocusNode _focusNode = FocusNode();
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      context.read<HomeBloc>().add(SearchPets(query));
+    });
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _focusNode.dispose();
+    searchController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textColor = theme.textTheme.bodyLarge?.color ?? AppColors.black;
+    final isDark = theme.brightness == Brightness.dark;
 
-    return BlocProvider(
-      create: (_) => HomeBloc(widget.getAllPetsUseCase)..add(LoadPets()),
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'Home',
-            style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Home',
+          style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: GestureDetector(
+          onTap: () => _focusNode.unfocus(),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 16),
               Container(
                 decoration: BoxDecoration(
-                  color:
-                      theme.inputDecorationTheme.fillColor ?? theme.cardColor,
+                  color: theme.inputDecorationTheme.fillColor ?? theme.cardColor,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade300),
+                  border: Border.all(
+                    color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    if (!isDark)
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                  ],
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: TextField(
                   controller: searchController,
+                  focusNode: _focusNode,
+                  onChanged: _onSearchChanged,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.textTheme.bodyMedium?.color,
+                  ),
                   decoration: InputDecoration(
-                    icon: Icon(Icons.search, color: Colors.grey),
+                    icon: Icon(
+                      Icons.search,
+                      color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                    ),
                     hintText: 'Search...',
+                    hintStyle: TextStyle(
+                      color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
+                    ),
                     border: InputBorder.none,
                   ),
-                  onChanged: (query) {
-                    context.read<HomeBloc>().add(SearchPets(query));
-                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Pets',
+                style: TextStyle(
+                  fontSize: 22,
+                  color: textColor,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 10),
@@ -84,21 +136,28 @@ class _HomeState extends State<Home> {
                     } else if (state is HomeLoaded) {
                       return ListView.builder(
                         controller: _scrollController,
-                        itemCount:
-                            state.pets.length + (state.isLoadingMore ? 1 : 0),
+                        itemCount: state.pets.length + 1,
                         itemBuilder: (context, index) {
                           if (index < state.pets.length) {
                             final pet = state.pets[index];
                             return PetCard(
                               pet: pet,
-                              onPetClicked: (p) {
-                                // Navigate to detail screen
-                              },
+                              onPetClicked: (p) =>
+                                  context.pushNamed('detail', extra: p),
+                            );
+                          }
+
+                          if (state.isLoadingMore) {
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 24),
+                              child: Center(child: CircularProgressIndicator()),
                             );
                           } else {
                             return const Padding(
                               padding: EdgeInsets.symmetric(vertical: 24),
-                              child: Center(child: CircularProgressIndicator()),
+                              child: Center(
+                                child: Text("No more pets available"),
+                              ),
                             );
                           }
                         },

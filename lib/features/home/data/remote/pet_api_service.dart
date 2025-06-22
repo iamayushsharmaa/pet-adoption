@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:hive/hive.dart';
 
 import '../model/pet_model.dart';
-
 class PetApiService {
   final Dio dio;
   final Box<PetModel> _cacheBox;
@@ -19,9 +18,10 @@ class PetApiService {
         },
       );
 
-      final pets = (response.data as List)
-          .map((e) => PetModel.fromJson(e))
-          .toList();
+      final List<dynamic> data = response.data;
+      print('🐶 API Response: $data');
+
+      final pets = data.map((e) => PetModel.fromJson(e)).toList();
 
       if (page == 1) {
         await _cacheBox.clear();
@@ -31,10 +31,13 @@ class PetApiService {
         await _cacheBox.put(pet.id, pet);
       }
 
+      print("✅ Cached ${pets.length} pets.");
       return pets;
-    } catch (e) {
-      return _cacheBox.values.toList();
+    } catch (e, st) {
+      print("❌ API error: $e");
+      print("🔍 Stacktrace: $st");
+      print("📦 Returning ${_cacheBox.length} cached pets");
+      return Future.value(_cacheBox.values.toList());
     }
   }
 }
-
