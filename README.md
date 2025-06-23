@@ -11,6 +11,8 @@ A beautiful and responsive Flutter app to browse, adopt, and favorite pets. Buil
 
   • View pet details with images and adoption info
 
+  • Hero animation for smooth pet image transitions
+
   • Favorite and unfavorite pets
 
   • Adopt pets and persist adoption status
